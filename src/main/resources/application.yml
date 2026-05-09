@@ -38,10 +38,7 @@ spring:
           max-wait: -1ms
 
   cache:
-    type: redis
-    redis:
-      time-to-live: 300000
-      cache-null-values: false
+    type: simple
 
 jwt:
   secret: ${JWT_SECRET:change-me-in-production}
