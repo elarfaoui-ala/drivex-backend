@@ -1,0 +1,36 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  main:
+    allow-bean-definition-overriding: true
+
+  # Use a fresh in-memory DB for each test run
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+  # Disable Redis for tests — use simple in-memory cache
+  cache:
+    type: simple
+
+  # Disable Redis auto-configuration for tests
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+# JWT — use a 256+ bit secret for test tokens
+jwt:
+  secret: drivex-test-secret-key-must-be-at-least-256-bits-long-for-hs256
+  expiration-ms: 86400000
+  refresh-expiration-ms: 604800000
+
+logging:
+  level:
+    com.drivex: DEBUG
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN

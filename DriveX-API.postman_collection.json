@@ -1,0 +1,331 @@
+{
+  "info": {
+    "name": "DriveX Backend API",
+    "description": "Complete DriveX delivery driver API collection.\n\n**Quick start:**\n1. Run 'Login Alex' — token auto-saved to {{accessToken}}\n2. All protected requests use {{accessToken}} automatically",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",    "value": "http://localhost:8080" },
+    { "key": "driverId",   "value": "drv-0001" },
+    { "key": "orderId",    "value": "ord-7741" },
+    { "key": "accessToken","value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login Alex (auto-saves token)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "if (json.accessToken) {",
+                "  pm.collectionVariables.set('accessToken', json.accessToken);",
+                "  pm.collectionVariables.set('driverId',   json.driver.id);",
+                "  console.log('Token saved for driver:', json.driver.name);",
+                "}",
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Has accessToken', () => pm.expect(json.accessToken).to.not.be.empty);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex@drivex.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Sara",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sara@drivex.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register New Driver",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Driver\",\n  \"email\": \"test@drivex.com\",\n  \"phone\": \"+15551234567\",\n  \"password\": \"password123\",\n  \"vehicle\": {\n    \"make\": \"Honda\",\n    \"model\": \"Civic\",\n    \"year\": 2022,\n    \"licensePlate\": \"TEST-001\",\n    \"color\": \"Blue\",\n    \"type\": \"CAR\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Bad Password (expect 401)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 401', () => pm.response.to.have.status(401));",
+                "pm.test('Error code INVALID_CREDENTIALS', () => {",
+                "  pm.expect(pm.response.json().code).to.eql('INVALID_CREDENTIALS');",
+                "});"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex@drivex.com\",\n  \"password\": \"wrongpassword\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Drivers",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/drivers/{{driverId}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "Get All Drivers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/drivers",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "Get Online Drivers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/drivers/online",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "Set Status ONLINE",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Status is ONLINE', () => {",
+                "  pm.expect(pm.response.json().status).to.eql('ONLINE');",
+                "});"
+              ]
+            }
+          }],
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/drivers/{{driverId}}/status",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"ONLINE\"\n}" }
+          }
+        },
+        {
+          "name": "Set Status OFFLINE",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/drivers/{{driverId}}/status",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"OFFLINE\"\n}" }
+          }
+        },
+        {
+          "name": "Update Location (REST)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/drivers/{{driverId}}/location",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"lat\": 40.7550,\n  \"lng\": -73.9890\n}" }
+          }
+        },
+        {
+          "name": "Get Last Known Location",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/drivers/{{driverId}}/location",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Get Available Orders (public)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                "var orders = pm.response.json();",
+                "if (orders.length > 0) {",
+                "  pm.collectionVariables.set('orderId', orders[0].id);",
+                "  console.log('Set orderId to:', orders[0].id, orders[0].orderNumber);",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/orders/available"
+          }
+        },
+        {
+          "name": "Get Active Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/orders/active",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "Get Order Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "Get Driver Order History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/driver/{{driverId}}?page=0&size=10",
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "status", "value": "DELIVERED", "disabled": true }
+              ]
+            },
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "Accept Order",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Order status is ACCEPTED', () => {",
+                "  pm.expect(pm.response.json().status).to.eql('ACCEPTED');",
+                "});"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/accept",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"driverId\": \"{{driverId}}\"\n}" }
+          }
+        },
+        {
+          "name": "Mark as Picked Up",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/status?driverId={{driverId}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"PICKED_UP\"\n}" }
+          }
+        },
+        {
+          "name": "Mark as En Route",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/status?driverId={{driverId}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"EN_ROUTE\"\n}" }
+          }
+        },
+        {
+          "name": "Mark as Delivered",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/status?driverId={{driverId}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"DELIVERED\"\n}" }
+          }
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}?driverId={{driverId}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Earnings",
+      "item": [
+        {
+          "name": "Today",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/earnings/{{driverId}}/today",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "This Week",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/earnings/{{driverId}}/week",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "This Month",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/earnings/{{driverId}}/month",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        },
+        {
+          "name": "Custom Date Range",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/earnings/{{driverId}}/custom?from=2024-01-01&to=2024-12-31",
+              "query": [
+                { "key": "from", "value": "2024-01-01" },
+                { "key": "to",   "value": "2024-12-31" }
+              ]
+            },
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{accessToken}}" }] }
+          }
+        }
+      ]
+    }
+  ]
+}

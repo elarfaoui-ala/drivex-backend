@@ -1,0 +1,18 @@
+services:
+
+  drivex-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: drivex-backend
+    env_file:
+      - .env
+    ports:
+      - "${PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/swagger-ui.html || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    restart: unless-stopped

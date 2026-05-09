@@ -1,0 +1,13 @@
+[build]
+# Use the Dockerfile for building (auto-detected by Railway)
+builder = "DOCKERFILE"
+
+[deploy]
+# Railway assigns a random PORT automatically
+healthcheck_path = "/swagger-ui.html"
+restart_policy_type = "on-failure"
+restart_policy_max_retries = 5
+
+[service]
+# Spring profile — set to "prod" for production
+SPRING_PROFILES_ACTIVE = "prod"
