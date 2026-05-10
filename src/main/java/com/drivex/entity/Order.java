@@ -36,7 +36,7 @@ public class Order {
     private String orderNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, columnDefinition = "varchar(20)")
     @Builder.Default
     private Status status = Status.NEW;
 
@@ -94,7 +94,7 @@ public class Order {
     private Boolean isUrgent = false;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(columnDefinition = "varchar(20)")
     @Builder.Default
     private Category category = Category.FOOD;
 

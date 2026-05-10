@@ -40,7 +40,7 @@ public class Driver {
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, columnDefinition = "varchar(20)")
     @Builder.Default
     private Status status = Status.OFFLINE;
 
