@@ -73,10 +73,10 @@ spring:
       on-profile: prod
 
   datasource:
-    url: jdbc:${DATABASE_URL}
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
     driver-class-name: org.postgresql.Driver
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 10
@@ -84,7 +84,6 @@ spring:
       validation-timeout: 5000
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: false
