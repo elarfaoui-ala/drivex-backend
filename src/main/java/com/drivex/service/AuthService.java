@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.beans.factory.annotation.Value;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -29,6 +30,10 @@ public class AuthService {
     private final DriverUserDetailsService userDetailsService;
     private final AuthenticationManager    authManager;
     private final PasswordEncoder          passwordEncoder;
+    private final EmailService             emailService;
+
+    @Value("${app.frontend.reset-password-url}")
+    private String resetPasswordUrl;
 
     // ── Register ──────────────────────────────────────────────────────────────
     @Transactional
@@ -111,8 +116,11 @@ public class AuthService {
         driver.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
         driverRepository.save(driver);
 
-        log.info("Password reset token generated for: {}", req.email());
-        return new MessageResponse("Reset link sent to " + req.email());
+        String resetLink = resetPasswordUrl + "?token=" + token;
+        emailService.sendPasswordResetEmail(req.email(), resetLink);
+
+        log.info("Password reset email sent to: {}", req.email());
+        return new MessageResponse("If the email exists, a reset link has been sent");
     }
 
     // ── Reset password ────────────────────────────────────────────────────────

@@ -20,8 +20,9 @@ import org.springframework.context.annotation.Configuration;
             2. Copy the `accessToken` → click **Authorize** button → paste as `Bearer <token>`
             3. Explore all endpoints
             
-            **WebSocket:** Connect to `ws://localhost:8080/ws` (SockJS)
-            with STOMP header `Authorization: Bearer <token>`
+            **WebSocket (prod):** Connect to `wss://api-drivex.up.railway.app/ws` (SockJS)
+             **WebSocket (local):** Connect to `ws://localhost:8080/ws` (SockJS)
+             with STOMP header `Authorization: Bearer <token>`
             """,
         contact = @Contact(name = "DriveX Team", email = "dev@drivex.com")
     ),

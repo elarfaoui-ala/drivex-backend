@@ -40,10 +40,31 @@ spring:
   cache:
     type: simple
 
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${SMTP_AUTH:false}
+          starttls:
+            enable: ${SMTP_TLS:false}
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
 jwt:
   secret: ${JWT_SECRET:change-me-in-production}
   expiration-ms: 86400000
   refresh-expiration-ms: 604800000
+
+app:
+  frontend:
+    reset-password-url: ${APP_FRONTEND_RESET_URL:http://localhost:5173/reset-password}
+  mail:
+    from: ${SMTP_FROM:noreply@drivex.com}
 
 server:
   port: ${PORT:8080}
@@ -92,6 +113,21 @@ spring:
   h2:
     console:
       enabled: false
+
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: ${SMTP_AUTH:true}
+          starttls:
+            enable: ${SMTP_TLS:true}
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
   data:
     redis:
