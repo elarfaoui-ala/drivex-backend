@@ -36,4 +36,16 @@ public class AuthController {
     public AuthResponse refresh(@Valid @RequestBody RefreshRequest req) {
         return authService.refresh(req);
     }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Send a password reset link to the driver's email")
+    public MessageResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
+        return authService.forgotPassword(req);
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Reset password using the token received via email")
+    public AuthResponse resetPassword(@Valid @RequestBody ResetPasswordRequest req) {
+        return authService.resetPassword(req);
+    }
 }

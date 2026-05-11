@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
     ),
     servers = {
         @Server(url = "http://localhost:8080", description = "Local dev (H2)"),
-        @Server(url = "https://api.drivex.com", description = "Production (PostgreSQL)")
+        @Server(url = "https://api-drivex.up.railway.app", description = "Production (PostgreSQL)")
     }
 )
 @SecurityScheme(

@@ -70,12 +70,22 @@ public class Driver {
     @Column(name = "last_seen_at")
     private LocalDateTime lastSeenAt;
 
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
     @OneToOne(mappedBy = "driver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Vehicle vehicle;
 
     @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Order> orders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<DriverDocument> documents = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

@@ -1,6 +1,7 @@
 package com.drivex.dto;
 
 import com.drivex.entity.Driver;
+import com.drivex.entity.DriverDocument;
 import com.drivex.entity.Order;
 import com.drivex.entity.Vehicle;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,6 +10,7 @@ import jakarta.validation.constraints.*;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -46,6 +48,15 @@ public final class Dtos {
     ) {}
 
     public record RefreshRequest(@NotBlank String refreshToken) {}
+
+    @Schema(description = "Forgot password request")
+    public record ForgotPasswordRequest(@NotBlank @Email String email) {}
+
+    @Schema(description = "Reset password request")
+    public record ResetPasswordRequest(
+        @NotBlank String token,
+        @NotBlank @Size(min = 6, max = 72) String newPassword
+    ) {}
 
     // ── Driver ────────────────────────────────────────────────────────────────
 
@@ -88,6 +99,19 @@ public final class Dtos {
         @NotNull @DecimalMin("-180") @DecimalMax("180") BigDecimal lng
     ) {}
 
+    @Schema(description = "Update driver profile request")
+    public record UpdateProfileRequest(
+        @NotBlank @Size(min = 2, max = 120) String name,
+        @NotBlank @Email                    String email,
+        @NotBlank @Pattern(regexp = "\\+?[0-9]{7,15}") String phone
+    ) {}
+
+    @Schema(description = "Change password request")
+    public record ChangePasswordRequest(
+        @NotBlank String currentPassword,
+        @NotBlank @Size(min = 6, max = 72) String newPassword
+    ) {}
+
     // ── Vehicle ───────────────────────────────────────────────────────────────
 
     public record VehicleRequest(
@@ -109,6 +133,37 @@ public final class Dtos {
                 v.getId(), v.getMake(), v.getModel(),
                 v.getModelYear(), v.getLicensePlate(),
                 v.getColor(), v.getType().name()
+            );
+        }
+    }
+
+    // ── Documents ─────────────────────────────────────────────────────────────
+
+    @Schema(description = "Upload driver document request")
+    public record DocumentUploadRequest(
+        @NotNull DriverDocument.Type type,
+        @NotBlank String fileUrl,
+        @NotBlank String fileName,
+        LocalDate expiryDate
+    ) {}
+
+    @Schema(description = "Driver document summary")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record DocumentResponse(
+        String        id,
+        String        type,
+        String        fileUrl,
+        String        fileName,
+        String        status,
+        LocalDate     expiryDate,
+        LocalDateTime uploadedAt,
+        LocalDateTime verifiedAt
+    ) {
+        public static DocumentResponse from(DriverDocument d) {
+            return new DocumentResponse(
+                d.getId(), d.getType().name(), d.getFileUrl(), d.getFileName(),
+                d.getStatus().name(), d.getExpiryDate(),
+                d.getUploadedAt(), d.getVerifiedAt()
             );
         }
     }

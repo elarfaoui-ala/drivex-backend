@@ -17,6 +17,8 @@ public interface DriverRepository extends JpaRepository<Driver, String> {
 
     Optional<Driver> findByEmail(String email);
 
+    Optional<Driver> findByResetToken(String resetToken);
+
     boolean existsByEmail(String email);
 
     List<Driver> findByStatus(Driver.Status status);

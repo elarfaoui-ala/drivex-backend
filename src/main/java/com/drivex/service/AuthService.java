@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -97,6 +98,39 @@ public class AuthService {
             .orElseThrow(() -> ApiException.unauthorized("Driver not found"));
 
         log.debug("Token refreshed for: {}", email);
+        return buildAuthResponse(driver);
+    }
+
+    // ── Forgot password ───────────────────────────────────────────────────────
+    public MessageResponse forgotPassword(ForgotPasswordRequest req) {
+        var driver = driverRepository.findByEmail(req.email())
+            .orElseThrow(() -> ApiException.notFound("Driver", req.email()));
+
+        String token = UUID.randomUUID().toString();
+        driver.setResetToken(token);
+        driver.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
+        driverRepository.save(driver);
+
+        log.info("Password reset token generated for: {}", req.email());
+        return new MessageResponse("Reset link sent to " + req.email());
+    }
+
+    // ── Reset password ────────────────────────────────────────────────────────
+    @Transactional
+    public AuthResponse resetPassword(ResetPasswordRequest req) {
+        var driver = driverRepository.findByResetToken(req.token())
+            .orElseThrow(() -> ApiException.badRequest("Invalid or expired reset token"));
+
+        if (driver.getResetTokenExpiry() == null || driver.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw ApiException.badRequest("Reset token has expired");
+        }
+
+        driver.setPasswordHash(passwordEncoder.encode(req.newPassword()));
+        driver.setResetToken(null);
+        driver.setResetTokenExpiry(null);
+        driverRepository.save(driver);
+
+        log.info("Password reset completed for: {}", driver.getEmail());
         return buildAuthResponse(driver);
     }
 

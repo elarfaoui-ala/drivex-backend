@@ -75,4 +75,41 @@ public class DriverController {
         if (loc == null) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(loc);
     }
+
+    // ── Profile update ─────────────────────────────────────────────────────────
+
+    @PutMapping("/{driverId}/profile")
+    @Operation(summary = "Update driver profile (name, email, phone)")
+    public DriverSummary updateProfile(
+        @PathVariable String driverId,
+        @Valid @RequestBody UpdateProfileRequest req
+    ) {
+        return driverService.updateProfile(driverId, req);
+    }
+
+    @PatchMapping("/{driverId}/password")
+    @Operation(summary = "Change driver password (requires current password)")
+    public MessageResponse changePassword(
+        @PathVariable String driverId,
+        @Valid @RequestBody ChangePasswordRequest req
+    ) {
+        return driverService.changePassword(driverId, req);
+    }
+
+    // ── Vehicle management ─────────────────────────────────────────────────────
+
+    @GetMapping("/{driverId}/vehicle")
+    @Operation(summary = "Get driver's registered vehicle")
+    public VehicleSummary getVehicle(@PathVariable String driverId) {
+        return driverService.getVehicle(driverId);
+    }
+
+    @PutMapping("/{driverId}/vehicle")
+    @Operation(summary = "Register or update driver's vehicle")
+    public VehicleSummary saveVehicle(
+        @PathVariable String driverId,
+        @Valid @RequestBody VehicleRequest req
+    ) {
+        return driverService.saveVehicle(driverId, req);
+    }
 }
