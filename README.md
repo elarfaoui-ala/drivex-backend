@@ -184,6 +184,11 @@ Authorization: Bearer <accessToken>
 | `SMTP_AUTH`                     | `true`                         | SMTP auth                    |
 | `SMTP_TLS`                      | `true`                         | STARTTLS                     |
 
+> **Email provider recommendations:** Gmail SMTP often blocks connections from cloud platforms like Railway. Use a transactional email service instead:
+> - **[Mailgun](https://www.mailgun.com/)** (free: 100 emails/day) — `smtp.mailgun.org:587`
+> - **[SendGrid](https://sendgrid.com/)** (free: 100 emails/day) — `smtp.sendgrid.net:587`
+> - **[Resend](https://resend.com/)** (free: 3000 emails/month) — `smtp.resend.com:465`
+
 Railway's PostgreSQL plugin auto-sets `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`.
 
 ---

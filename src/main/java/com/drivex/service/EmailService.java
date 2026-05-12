@@ -55,7 +55,7 @@ public class EmailService {
             mailSender.send(message);
             log.info("Password reset email sent to {}", to);
         } catch (Exception e) {
-            log.error("Failed to send password reset email to {}: {}", to, e.getMessage());
+            log.error("Failed to send password reset email to {}. Check SMTP_HOST/SMTP_USERNAME/SMTP_PASSWORD env vars. Error: {}", to, e.getMessage());
         }
     }
 }
