@@ -28,6 +28,7 @@ import java.util.UUID;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
+@Profile("dev")
 public class DataInitializer {
 
     private final DriverRepository driverRepository;
